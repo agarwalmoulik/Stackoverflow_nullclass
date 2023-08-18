@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Sample Website</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="https://cdn.botframework.com/botframework-webchat/latest/webchat.js"></script>
+</head>
+<body>
+	<header>
+		<nav>
+			<ul>
+				<li><a href="#">Home</a></li>
+				<li><a href="#">About Us</a></li>
+				<li><a href="#">Services</a></li>
+				<li><a href="#">Contact Us</a></li>
+			</ul>
+		</nav>
+	</header>
+	<main>
+		<section class="hero">
+			<h1>Welcome to Our Website</h1>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod quam vel faucibus gravida. </p>
+			<button>Learn More</button>
+		</section>
+		<section class="services">
+			<h2>Our Services</h2>
+			<ul>
+				<li><i class="fas fa-code"></i>Web Development</li>
+				<li><i class="fas fa-paint-brush"></i>Graphic Design</li>
+				<li><i class="fas fa-search"></i>SEO Optimization</li>
+				<li><i class="fas fa-mobile-alt"></i>Mobile Development</li>
+			</ul>
+		</section>
+		<section class="about-us">
+			<h2>About Us</h2>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod quam vel faucibus gravida. Duis ut ante bibendum, laoreet arcu ac, vestibulum mi.</p>
+			<button>Read More</button>
+		</section>
+		<section class="chatbot">
+			<h2>Chat with us</h2>
+			<div id="webchat" role="main"></div>
+		</section>
+	</main>
+	<footer>
+		<p>&copy; 2023 Sample Website. All Rights Reserved.</p>
+	</footer>
+	<script src="script.js"></script>
+	<script>
+		(async function() {
+			const res = await fetch('https://directline.botframework.com/v3/directline/tokens/generate', {
+				method: 'POST',
+				headers: {
+					'Authorization': 'Bearer <YOUR_DIRECT_LINE_SECRET>'
+				}
+			});
+
+			const { token } = await res.json();
+
+			const store = window.WebChat.createStore({}, ({ dispatch }) => next => action => {
+				if (action.type === 'DIRECT_LINE/CONNECT_FULFILLED') {
+					dispatch({
+						type: 'WEB_CHAT/SEND_EVENT',
+						payload: {
+							name: 'webchat/join',
+							value: { language: window.navigator.language }
+						}
+					});
+				}
+
+				return next(action);
+			});
+
+			window.WebChat.renderWebChat({
+				directLine: window.WebChat.createDirectLine({ token }),
+				store,
+				styleOptions: {
+					accent: '#0078D7'
+				}
+			}, document.getElementById('webchat'));
+		})();
+	</script>
+</body>
+</html>
